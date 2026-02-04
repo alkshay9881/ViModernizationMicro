@@ -15,7 +15,7 @@
     </parent>
 
     <groupId>com.mobicule.vodafone</groupId>
-    <artifactId>microservices-parent</artifactId>
+    <artifactId>ViModernization-parent</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>microservices-parent</name>

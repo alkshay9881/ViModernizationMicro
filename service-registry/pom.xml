@@ -6,7 +6,7 @@
     <!-- ✅ CUSTOM PARENT -->
     <parent>
         <groupId>com.mobicule.vodafone</groupId>
-        <artifactId>microservices-parent</artifactId>
+        <artifactId>ViModernization-parent</artifactId>
         <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
