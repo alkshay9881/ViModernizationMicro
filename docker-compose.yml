@@ -1,0 +1,32 @@
+version: "3.9"
+
+networks:
+  vimodernization-net:
+
+services:
+
+  # ------------------ EUREKA SERVER ------------------
+  service-registry:
+    build:
+      context: ./service-registry
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - vimodernization-net
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  # ------------------ API GATEWAY ------------------
+  api-gateway:
+    build:
+      context: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "9090:9090"
+    networks:
+      - vimodernization-net
+    depends_on:
+      - service-registry
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
