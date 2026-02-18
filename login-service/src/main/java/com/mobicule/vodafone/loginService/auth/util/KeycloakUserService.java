@@ -3,10 +3,17 @@ package com.mobicule.vodafone.loginService.auth.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,97 +23,151 @@ import java.util.Map;
 public class KeycloakUserService {
 
 
-
+    private final RestTemplate restTemplate = new RestTemplate();
     @Value("${keycloak.auth-server-url}")
     private String serverUrl;
-
     @Value("${keycloak.realm}")
     private String realm;
-
     @Value("${keycloak.admin.client-id}")
     private String adminClientId;
 
-    @Value("${keycloak.admin.username}")
-    private String adminUsername;
-
-    @Value("${keycloak.admin.password}")
-    private String adminPassword;
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Value("${keycloak.client.secret}")
+    private String clientSecret;
 
     // =========================
     // 1. GET ADMIN TOKEN
     // =========================
+//
+
+
     private String getAdminToken() {
+        try {
+            String tokenUrl = serverUrl + "/realms/vodafone/protocol/openid-connect/token";
 
-        String tokenUrl = serverUrl + "/realms/master/protocol/openid-connect/token";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            // Use client_credentials, no username/password
+            String body =
+                    "grant_type=client_credentials" +
+                            "&client_id=" + adminClientId +
+                            "&client_secret=" + clientSecret;
 
-        String body =
-                "grant_type=password" +
-                        "&client_id=" + adminClientId +
-                        "&username=" + adminUsername +
-                        "&password=" + adminPassword;
+            HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+            ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, entity, Map.class);
 
-        ResponseEntity<Map> response =
-                restTemplate.postForEntity(tokenUrl, entity, Map.class);
 
-        return (String) response.getBody().get("access_token");
+            log.info("token22  -- "+(String) response.getBody().get("access_token"));
+
+            return (String) response.getBody().get("access_token");
+
+        } catch (ResourceAccessException e) {
+            log.info("Timeout Exception : ", e);
+            throw new ResourceAccessException("Request timed out while communicating with the server. Please retry.");
+
+        } catch (HttpClientErrorException e) {
+            log.info("HTTP Client Error: " + e.getRawStatusCode() + " - " + e.getResponseBodyAsString(), e);
+            throw new HttpClientErrorException(e.getStatusCode(), e.getResponseBodyAsString());
+
+        } catch (HttpServerErrorException e) {
+            log.info("HTTP Server Error: " + e.getRawStatusCode() + " - " + e.getResponseBodyAsString(), e);
+            throw new HttpServerErrorException(e.getStatusCode(), e.getResponseBodyAsString());
+        }
     }
 
+
+    /* private String getAdminToken() {
+         try {
+             String tokenUrl = serverUrl + "/realms/vodafone/protocol/openid-connect/token";
+
+             HttpHeaders headers = new HttpHeaders();
+             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+             // Use MultiValueMap for proper URL encoding
+             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+             body.add("grant_type", "password");
+             body.add("client_id", adminClientId);
+             body.add("client_secret", clientSecret);
+             body.add("username", adminUsername);
+             body.add("password", adminPassword);
+
+             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
+
+             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, entity, Map.class);
+
+             if (response.getBody() != null && response.getBody().containsKey("access_token")) {
+                 return (String) response.getBody().get("access_token");
+             } else {
+                 throw new RuntimeException("Failed to obtain token: " + response.getBody());
+             }
+
+         } catch (HttpClientErrorException e) {
+             // Log the error response from Keycloak
+            log.info("Keycloak error: " + e.getResponseBodyAsString());
+             throw e;
+         }
+     }
+ */
     // =========================
     // 2. FIND USER
-    // =========================
     private String findUserId(String username, String token) {
+        try {
+            String url = serverUrl + "/admin/realms/" + realm + "/users?username=" +
+                    URLEncoder.encode(username, StandardCharsets.UTF_8);
 
-        String url = serverUrl + "/admin/realms/" + realm + "/users?username=" + username;
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
 
-        HttpEntity<Void> entity = new HttpEntity<>(headers);
+            ResponseEntity<List<Map<String, Object>>> response =
+                    restTemplate.exchange(url, HttpMethod.GET, entity,
+                            new ParameterizedTypeReference<List<Map<String, Object>>>() {});
 
-        ResponseEntity<List> response =
-                restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+            List<Map<String, Object>> users = response.getBody();
 
-        List users = response.getBody();
-
-        if (users != null && !users.isEmpty()) {
-            Map user = (Map) users.get(0);
-            return (String) user.get("id");
+            if (users != null && !users.isEmpty()) {
+                return (String) users.get(0).get("id");
+            }
+        } catch (Exception e) {
+            log.error("Error finding user ID for username: {}", username, e);
         }
 
         return null;
     }
-
     // =========================
     // 3. CREATE USER
     // =========================
     private String createUser(String username, String token) {
+        try {
+            String url = serverUrl + "/admin/realms/" + realm + "/users";
 
-        String url = serverUrl + "/admin/realms/" + realm + "/users";
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(token);
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        headers.setContentType(MediaType.APPLICATION_JSON);
+            Map<String, Object> user = new HashMap<>();
+            user.put("username", username);
+            user.put("enabled", true);
 
-        Map<String, Object> user = new HashMap<>();
-        user.put("username", username);
-        user.put("enabled", true);
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(user, headers);
+            ResponseEntity<Void> response = restTemplate.postForEntity(url, entity, Void.class);
 
-        HttpEntity<Map<String, Object>> entity =
-                new HttpEntity<>(user, headers);
+            if (response.getStatusCode() != HttpStatus.CREATED) {
+                throw new RuntimeException("Failed to create user, status: " + response.getStatusCode());
+            }
 
-        ResponseEntity<Void> response =
-                restTemplate.postForEntity(url, entity, Void.class);
+            URI locationUri = response.getHeaders().getLocation();
+            if (locationUri == null) {
+                throw new RuntimeException("User created but Location header missing");
+            }
 
-        // Extract userId from Location header
-        String location = response.getHeaders().getLocation().toString();
-        return location.substring(location.lastIndexOf("/") + 1);
+            return locationUri.getPath().substring(locationUri.getPath().lastIndexOf("/") + 1);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error creating user: " + username, e);
+        }
     }
 
     // =========================
@@ -129,7 +190,31 @@ public class KeycloakUserService {
         HttpEntity<Map<String, Object>> entity =
                 new HttpEntity<>(pass, headers);
 
-        restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+        try {
+            ResponseEntity<Void> response =
+                    restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+
+            // 🔎 Keycloak returns 204 NO_CONTENT if successful
+            if (response.getStatusCode() == HttpStatus.NO_CONTENT) {
+                log.info("Password set successfully for userId: " + userId);
+            } else {
+                throw new RuntimeException(" Failed to set password. Status: "
+                        + response.getStatusCode());
+            }
+
+        } catch (HttpClientErrorException e) {
+            log.info(" Client error while setting password: "
+                    + e.getResponseBodyAsString());
+            throw new RuntimeException("Password reset failed", e);
+
+        } catch (HttpServerErrorException e) {
+            log.info("Server error while setting password: "
+                    + e.getResponseBodyAsString());
+            throw new RuntimeException("Password reset failed", e);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error while setting password", e);
+        }
     }
 
     // =========================

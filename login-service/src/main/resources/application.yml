@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: login-service
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+

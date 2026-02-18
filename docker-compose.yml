@@ -2,10 +2,11 @@ version: "3.9"
 
 networks:
   vimodernization-net:
-    driver: bridge
+    external: true
 
 services:
 
+  # ---------------- SERVICE REGISTRY ----------------
   service-registry:
     build: ./service-registry
     container_name: service-registry
@@ -16,6 +17,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: uat
 
+  # ---------------- API GATEWAY ----------------
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
@@ -25,9 +27,11 @@ services:
       - vimodernization-net
     depends_on:
       - service-registry
+      - keycloak
     environment:
       SPRING_PROFILES_ACTIVE: uat
 
+  # ---------------- LOGIN SERVICE ----------------
   login-service:
     build: ./login-service
     container_name: login-service
@@ -37,5 +41,26 @@ services:
       - vimodernization-net
     depends_on:
       - service-registry
+      - keycloak
     environment:
       SPRING_PROFILES_ACTIVE: uat
+
+  # ---------------- VODAFONE EKYC KEYCLOAK ----------------
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: vodafone_keycloak
+    ports:
+      - "8080:8080"
+    networks:
+      - vimodernization-net
+    volumes:
+      - /home/akshay/Desktop/ojdbc11.jar:/opt/keycloak/providers/ojdbc11.jar
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: oracle
+      KC_DB_URL: jdbc:oracle:thin:@10.1.1.207:1521:orcl
+      KC_DB_USERNAME: vodafone_ekyc_keycloak
+      KC_DB_PASSWORD: welcome
+    command: [ "start-dev" ]

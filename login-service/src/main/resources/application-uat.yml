@@ -7,22 +7,26 @@ keycloak:
   # PRE-LOGIN TOKEN
   # -----------------------------
   token:
-    url: http://172.31.1.199:8080/realms/master/protocol/openid-connect/token
+    url: http://keycloak:8080/realms/vodafone/protocol/openid-connect/token
 
   client:
-    id: micro-auth
-    secret: Wq9EPVluxOLF0fOqSMb7NL3zEUZFvzXc
+    id: vconnect-app
+    secret: SImFMDuahivRMQkl4dSSOAUcVMrcCgIk
 
   # -----------------------------
   # ADMIN / USER MANAGEMENT
   # -----------------------------
-  auth-server-url: http://172.31.1.199:8080
-  realm: master
+  auth-server-url: http://keycloak:8080
+  realm: vodafone
+
+#  admin:
+#    client-id: admin-cli
+#    username: admin
+#    password: admin
 
   admin:
-    client-id: admin-cli
-    username: admin
-    password: admin
+    client-id: vconnect-app
+    client-secret: SImFMDuahivRMQkl4dSSOAUcVMrcCgIk
 
 eureka:
   client:
