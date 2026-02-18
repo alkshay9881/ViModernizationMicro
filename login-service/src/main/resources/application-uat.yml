@@ -1,32 +1,30 @@
 server:
   port: 9091
 
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
-
-
 keycloak:
+
   # -----------------------------
-  # PRE-LOGIN TOKEN (existing)
+  # PRE-LOGIN TOKEN
   # -----------------------------
   token:
-    url: http://localhost:8080/realms/master/protocol/openid-connect/token
+    url: http://172.31.1.199:8080/realms/master/protocol/openid-connect/token
 
   client:
     id: micro-auth
     secret: Wq9EPVluxOLF0fOqSMb7NL3zEUZFvzXc
 
-
   # -----------------------------
   # ADMIN / USER MANAGEMENT
   # -----------------------------
-  auth-server-url: http://localhost:8080
+  auth-server-url: http://172.31.1.199:8080
   realm: master
 
   admin:
     client-id: admin-cli
     username: admin
     password: admin
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka

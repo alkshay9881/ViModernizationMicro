@@ -1,4 +1,4 @@
-package com.mobicule.vodafone.loginService.dto;
+package com.mobicule.vodafone.loginService.common.dto;
 
 
 

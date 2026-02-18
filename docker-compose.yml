@@ -2,25 +2,22 @@ version: "3.9"
 
 networks:
   vimodernization-net:
+    driver: bridge
 
 services:
 
-  # ------------------ EUREKA SERVER ------------------
   service-registry:
-    build:
-      context: ./service-registry
+    build: ./service-registry
     container_name: service-registry
     ports:
       - "8761:8761"
     networks:
       - vimodernization-net
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      SPRING_PROFILES_ACTIVE: uat
 
-  # ------------------ API GATEWAY ------------------
   api-gateway:
-    build:
-      context: ./api-gateway
+    build: ./api-gateway
     container_name: api-gateway
     ports:
       - "9090:9090"
@@ -29,4 +26,16 @@ services:
     depends_on:
       - service-registry
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      SPRING_PROFILES_ACTIVE: uat
+
+  login-service:
+    build: ./login-service
+    container_name: login-service
+    ports:
+      - "9091:9091"
+    networks:
+      - vimodernization-net
+    depends_on:
+      - service-registry
+    environment:
+      SPRING_PROFILES_ACTIVE: uat

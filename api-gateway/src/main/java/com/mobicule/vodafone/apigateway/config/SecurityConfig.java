@@ -1,8 +1,6 @@
 package com.mobicule.vodafone.apigateway.config;
 
 
-
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -20,7 +18,10 @@ public class SecurityConfig {
 
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/eureka/**").permitAll()
-                        .pathMatchers("/api/auth/v1/otp/generateOTP").permitAll()
+                        .pathMatchers("/api/v1/auth/generateOTP").permitAll()
+                        .pathMatchers("/api/v1/auth/refreshToken").permitAll()
+
+
                         .anyExchange().authenticated()
                 )
 

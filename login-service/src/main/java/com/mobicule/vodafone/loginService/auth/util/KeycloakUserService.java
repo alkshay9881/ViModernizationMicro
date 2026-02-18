@@ -1,22 +1,21 @@
-package com.mobicule.vodafone.loginService.util;
+package com.mobicule.vodafone.loginService.auth.util;
 
 
-import com.mobicule.vodafone.loginService.auth.controller.OtpController;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
+@Slf4j
 public class KeycloakUserService {
 
 
-    private static final Logger log =
-            LoggerFactory.getLogger(KeycloakUserService.class);
 
     @Value("${keycloak.auth-server-url}")
     private String serverUrl;

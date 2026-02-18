@@ -1,6 +1,3 @@
-server:
-  port: 9090
-
 spring:
   application:
     name: api-gateway
@@ -13,12 +10,20 @@ spring:
         - id: login-service
           uri: lb://LOGIN-SERVICE
           predicates:
-            - Path=/api/auth/**
+            - Path=/api/v1/auth/**
 #          filters:
 #            - name: CircuitBreaker
 #              args:
 #                name: loginServiceCB
 #                fallbackUri: forward:/fallback/login
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
 
 management:
   endpoints:
@@ -29,5 +34,8 @@ management:
     health:
       show-details: always
 
+logging:
+  pattern:
+     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
 

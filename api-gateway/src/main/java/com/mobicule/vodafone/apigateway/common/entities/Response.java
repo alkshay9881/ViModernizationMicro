@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;  // Added for ignoring field
 import com.fasterxml.jackson.annotation.JsonProperty;  // Added for custom property names
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -13,12 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@Slf4j
 public class Response {
 
-	// Commented out instance Logger (not serialized anyway, but static Logger is fine)
-	// private final Logger log = LoggerFactory.getLogger(this.getClass());
 
-	private static final Logger log = LoggerFactory.getLogger(Response.class);
 
 	public enum ResponseStatus {
 		SUCCESS, FAILURE, upgrade_major, upgrade_minor;

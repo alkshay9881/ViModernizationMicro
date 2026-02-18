@@ -1,4 +1,4 @@
-package com.mobicule.vodafone.loginService.platformCommons;
+package com.mobicule.vodafone.loginService.common.exceptions;
 
 
 import org.slf4j.Logger;
