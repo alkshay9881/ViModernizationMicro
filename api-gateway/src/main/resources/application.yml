@@ -6,24 +6,52 @@ spring:
     gateway:
       routes:
 
-          # -------- login SERVICE --------
+        - id: genrateOTP-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/generateOTP
+          filters:
+            - name: CircuitBreaker
+              args:
+                  name: loginServiceCB
+                  fallbackUri: forward:/fallback/login
+
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 1
+                redis-rate-limiter.burstCapacity: 3
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@mobileKeyResolver}"
+
+        - id: verifyOTP-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/verifyOTP
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 2
+                redis-rate-limiter.burstCapacity: 3
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
+          # --------all other login SERVICE --------
         - id: login-service
           uri: lb://LOGIN-SERVICE
           predicates:
             - Path=/api/v1/auth/**
-#          filters:
-#            - name: CircuitBreaker
-#              args:
-#                name: loginServiceCB
-#                fallbackUri: forward:/fallback/login
           filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 1
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
                 redis-rate-limiter.requestedTokens: 1
                 key-resolver: "#{@userIdKeyResolver}"
-
 
 management:
   endpoints:
