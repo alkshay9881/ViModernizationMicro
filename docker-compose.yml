@@ -27,7 +27,6 @@ services:
       - vimodernization-net
     depends_on:
       - service-registry
-      - keycloak
     environment:
       SPRING_PROFILES_ACTIVE: uat
 
@@ -41,7 +40,6 @@ services:
       - vimodernization-net
     depends_on:
       - service-registry
-      - keycloak
     environment:
       SPRING_PROFILES_ACTIVE: uat
 
