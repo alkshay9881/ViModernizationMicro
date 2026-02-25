@@ -3,6 +3,10 @@ eureka:
     service-url:
       defaultZone: http://service-registry:8761/eureka
 
+jwt:
+  enabled: true
+
+propertyFiles: config/prod/propertyFilePaths.yml
 
 
 

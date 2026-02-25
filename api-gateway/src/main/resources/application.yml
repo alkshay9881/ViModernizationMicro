@@ -6,36 +6,75 @@ spring:
     gateway:
       routes:
 
-        - id: genrateOTP-api
+        # ================= GENERATE OTP =================
+        - id: generateOTP-api
           uri: lb://LOGIN-SERVICE
           predicates:
             - Path=/api/v1/auth/generateOTP
           filters:
             - name: CircuitBreaker
               args:
-                  name: loginServiceCB
-                  fallbackUri: forward:/fallback/login
-
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 1
-                redis-rate-limiter.burstCapacity: 3
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
                 redis-rate-limiter.requestedTokens: 1
                 key-resolver: "#{@mobileKeyResolver}"
 
+        # ================= VERIFY OTP =================
         - id: verifyOTP-api
           uri: lb://LOGIN-SERVICE
           predicates:
             - Path=/api/v1/auth/verifyOTP
           filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 2
-                redis-rate-limiter.burstCapacity: 3
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
                 redis-rate-limiter.requestedTokens: 1
                 key-resolver: "#{@userIdKeyResolver}"
 
-          # --------all other login SERVICE --------
+        # ================= REFRESH TOKEN =================
+        - id: refresh-token-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/refreshToken
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
+        # ================= VERIFY PASSWORD =================
+        - id: verify-pass-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/verifyPassword
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
+        # ================= ALL OTHER LOGIN APIs =================
         - id: login-service
           uri: lb://LOGIN-SERVICE
           predicates:
@@ -45,14 +84,34 @@ spring:
               args:
                 name: loginServiceCB
                 fallbackUri: forward:/fallback/login
-
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 5
-                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
                 redis-rate-limiter.requestedTokens: 1
                 key-resolver: "#{@userIdKeyResolver}"
 
+
+# ================= RESILIENCE4J CONFIG =================
+resilience4j:
+
+  timelimiter:
+    instances:
+      loginServiceCB:
+        timeoutDuration: 10s
+        cancelRunningFuture: true
+
+  circuitbreaker:
+    instances:
+      loginServiceCB:
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 20s
+        permittedNumberOfCallsInHalfOpenState: 5
+
+
+# ================= MANAGEMENT =================
 management:
   endpoints:
     web:
@@ -62,8 +121,8 @@ management:
     health:
       show-details: always
 
+
+# ================= LOGGING =================
 logging:
   pattern:
-     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-
-
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

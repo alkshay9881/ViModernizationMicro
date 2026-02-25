@@ -1,6 +1,10 @@
 server:
   port: 9090
 
+jwt:
+  enabled: false
+
+propertyFiles: config/uat/propertyFilePaths.yml
 
 spring:
   redis:
