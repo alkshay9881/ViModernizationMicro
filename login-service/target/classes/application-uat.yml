@@ -1,0 +1,38 @@
+server:
+  port: 9091
+
+propertyFiles: config/uat/propertyFilePaths.yml
+
+keycloak:
+
+  # -----------------------------
+  # PRE-LOGIN TOKEN
+  # -----------------------------
+  token:
+    url: http://keycloak:8080/realms/vodafone/protocol/openid-connect/token
+
+  client:
+    id: vconnect-app
+    secret: MEbp3rUkqg8KtEjTFHmY7gQKbfnvRh1V
+
+  # -----------------------------
+  # ADMIN / USER MANAGEMENT
+  # -----------------------------
+  auth-server-url: http://keycloak:8080
+  realm: vodafone
+
+#  admin:
+#    client-id: admin-cli
+#    username: admin
+#    password: admin
+
+  admin:
+    client-id: vconnect-app
+    client-secret: MEbp3rUkqg8KtEjTFHmY7gQKbfnvRh1V
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://service-registry:8761/eureka
+  instance:
+    prefer-ip-address: true
