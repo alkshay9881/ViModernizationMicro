@@ -20,15 +20,6 @@ import java.util.ArrayList;
 public class FallbackController {
 
 
-    @GetMapping("/login")
-    public Response loginFallback() {
-
-        Response response = new Response(Response.ResponseStatus.FAILURE, "login Service is currently unavailable", new ArrayList<>());
-        log.info("Response : "+response.getResponseString());
-        return response;
-
-    }
-
 
     @PostMapping("/login")
     public Response loginFallbackPost() {

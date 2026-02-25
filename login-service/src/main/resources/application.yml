@@ -2,8 +2,19 @@ spring:
   application:
     name: login-service
 
+# ================= MANAGEMENT =================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# ================= LOGGING =================
+
 logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-
-
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS, Asia/Kolkata} %level [%thread] %logger{36} - %msg%n"

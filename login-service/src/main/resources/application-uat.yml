@@ -1,6 +1,8 @@
 server:
   port: 9091
 
+propertyFiles: config/uat/propertyFilePaths.yml
+
 keycloak:
 
   # -----------------------------
@@ -32,3 +34,5 @@ eureka:
   client:
     service-url:
       defaultZone: http://service-registry:8761/eureka
+  instance:
+    prefer-ip-address: true

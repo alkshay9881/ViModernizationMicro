@@ -6,9 +6,9 @@ networks:
 
 services:
 
-  # ---------------- SERVICE REGISTRY ----------------
   service-registry:
     build: ./service-registry
+    image: service-registry:1.0
     container_name: service-registry
     ports:
       - "8761:8761"
@@ -16,10 +16,12 @@ services:
       - vimodernization-net
     environment:
       SPRING_PROFILES_ACTIVE: uat
+    volumes:
+      - "/home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles"
 
-  # ---------------- API GATEWAY ----------------
   api-gateway:
     build: ./api-gateway
+    image: api-gateway:1.0
     container_name: api-gateway
     ports:
       - "9090:9090"
@@ -29,10 +31,12 @@ services:
       - service-registry
     environment:
       SPRING_PROFILES_ACTIVE: uat
+    volumes:
+      - "/home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles"
 
-  # ---------------- LOGIN SERVICE ----------------
   login-service:
     build: ./login-service
+    image: login-service:1.0
     container_name: login-service
     ports:
       - "9091:9091"
@@ -42,23 +46,25 @@ services:
       - service-registry
     environment:
       SPRING_PROFILES_ACTIVE: uat
+    volumes:
+      - "/home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles"
 
   # ---------------- VODAFONE EKYC KEYCLOAK ----------------
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:24.0.1
-    container_name: vodafone_keycloak
-    ports:
-      - "8080:8080"
-    networks:
-      - vimodernization-net
-    volumes:
-      - /home/akshay/Desktop/ojdbc11.jar:/opt/keycloak/providers/ojdbc11.jar
-    environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_DB: oracle
-      KC_DB_URL: jdbc:oracle:thin:@10.1.1.207:1521:orcl
-      KC_DB_USERNAME: vodafone_ekyc_keycloak
-      KC_DB_PASSWORD: welcome
-    command: [ "start-dev" ]
+#  keycloak:
+#    image: quay.io/keycloak/keycloak:24.0.1
+#    container_name: vodafone_keycloak
+#    ports:
+#      - "8080:8080"
+#    networks:
+#      - vimodernization-net
+#    volumes:
+#      - /home/akshay/Desktop/ojdbc11.jar:/opt/keycloak/providers/ojdbc11.jar
+#    environment:
+#      KEYCLOAK_ADMIN: admin
+#      KEYCLOAK_ADMIN_PASSWORD: admin
+#      KC_DB: oracle
+#      KC_DB_URL: jdbc:oracle:thin:@10.1.1.207:1521:orcl
+#      KC_DB_USERNAME: vodafone_ekyc_keycloak
+#      KC_DB_PASSWORD: welcome
+#    command: [ "start-dev" ]
