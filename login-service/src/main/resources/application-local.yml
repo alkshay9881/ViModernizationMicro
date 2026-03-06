@@ -29,10 +29,7 @@ keycloak:
   auth-server-url: http://localhost:8080
   realm: vodafone
 
-#  admin:
-#    client-id: admin-cli
-#    username: admin
-#    password: admin
+
   admin:
     client-id: vconnect-app
     client-secret: MEbp3rUkqg8KtEjTFHmY7gQKbfnvRh1V

@@ -6,6 +6,7 @@ networks:
 
 services:
 
+  # ---------------- SERVICE REGISTRY ----------------
   service-registry:
     build: ./service-registry
     image: service-registry:1.0
@@ -16,9 +17,22 @@ services:
       - vimodernization-net
     environment:
       SPRING_PROFILES_ACTIVE: uat
-    volumes:
-      - "/home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles"
+      # OpenTelemetry Java Agent
+      JAVA_TOOL_OPTIONS: -javaagent:/otel/opentelemetry-javaagent.jar
 
+      # SigNoz internal OTEL collector (gRPC 4317)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz-otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+
+      OTEL_SERVICE_NAME: service-registry
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+    volumes:
+      - /home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles
+      - /home/akshay/Desktop/docker/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar
+
+  # ---------------- API GATEWAY ----------------
   api-gateway:
     build: ./api-gateway
     image: api-gateway:1.0
@@ -31,9 +45,25 @@ services:
       - service-registry
     environment:
       SPRING_PROFILES_ACTIVE: uat
-    volumes:
-      - "/home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles"
 
+      # OpenTelemetry Java Agent
+      JAVA_TOOL_OPTIONS: -javaagent:/otel/opentelemetry-javaagent.jar
+
+      # SigNoz internal OTEL collector (gRPC 4317)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz-otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+
+      OTEL_SERVICE_NAME: api-gateway
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+
+
+    volumes:
+      - /home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles
+      - /home/akshay/Desktop/docker/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar
+
+  # ---------------- LOGIN SERVICE ----------------
   login-service:
     build: ./login-service
     image: login-service:1.0
@@ -46,10 +76,24 @@ services:
       - service-registry
     environment:
       SPRING_PROFILES_ACTIVE: uat
-    volumes:
-      - "/home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles"
 
-  # ---------------- VODAFONE EKYC KEYCLOAK ----------------
+      # OpenTelemetry Java Agent
+      JAVA_TOOL_OPTIONS: -javaagent:/otel/opentelemetry-javaagent.jar
+
+      # SigNoz internal OTEL collector (gRPC 4317)
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://signoz-otel-collector:4317
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+
+      OTEL_SERVICE_NAME: login-service
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_METRICS_EXPORTER: otlp
+      OTEL_LOGS_EXPORTER: otlp
+
+
+    volumes:
+      - /home/akshay/Project Documents/DKYC_sammer/property_files:/app/config/propertyfiles
+      - /home/akshay/Desktop/docker/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar
+
 
 #  keycloak:
 #    image: quay.io/keycloak/keycloak:24.0.1
@@ -68,3 +112,6 @@ services:
 #      KC_DB_USERNAME: vodafone_ekyc_keycloak
 #      KC_DB_PASSWORD: welcome
 #    command: [ "start-dev" ]
+
+
+

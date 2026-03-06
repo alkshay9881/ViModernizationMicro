@@ -37,7 +37,7 @@ public class KeycloakTokenUtil {
     // =====================================================
     // 1) PRE-LOGIN TOKEN (Client Credentials)
     // =====================================================
-    public String getPreLoginToken() {
+     public String getPreLoginToken() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 

@@ -3,14 +3,12 @@ spring:
     name: login-service
 
 # ================= MANAGEMENT =================
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health, metrics
+
 
 # ================= LOGGING =================
 
