@@ -95,23 +95,23 @@ services:
       - /home/akshay/Desktop/docker/opentelemetry-javaagent.jar:/otel/opentelemetry-javaagent.jar
 
 
-#  keycloak:
-#    image: quay.io/keycloak/keycloak:24.0.1
-#    container_name: vodafone_keycloak
-#    ports:
-#      - "8080:8080"
-#    networks:
-#      - vimodernization-net
-#    volumes:
-#      - /home/akshay/Desktop/ojdbc11.jar:/opt/keycloak/providers/ojdbc11.jar
-#    environment:
-#      KEYCLOAK_ADMIN: admin
-#      KEYCLOAK_ADMIN_PASSWORD: admin
-#      KC_DB: oracle
-#      KC_DB_URL: jdbc:oracle:thin:@10.1.1.207:1521:orcl
-#      KC_DB_USERNAME: vodafone_ekyc_keycloak
-#      KC_DB_PASSWORD: welcome
-#    command: [ "start-dev" ]
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.1
+    container_name: vodafone_keycloak
+    ports:
+      - "8080:8080"
+    networks:
+      - vimodernization-net
+    volumes:
+      - /home/akshay/Desktop/ojdbc11.jar:/opt/keycloak/providers/ojdbc11.jar
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: oracle
+      KC_DB_URL: jdbc:oracle:thin:@10.1.1.207:1521:orcl
+      KC_DB_USERNAME: vodafone_ekyc_keycloak
+      KC_DB_PASSWORD: welcome
+    command: [ "start-dev" ]
 
 
 
