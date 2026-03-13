@@ -20,7 +20,7 @@ keycloak:
 
   client:
     id: vconnect-app
-    secret: MEbp3rUkqg8KtEjTFHmY7gQKbfnvRh1V
+    secret: NkQGc4WoQqfTISbNLVjL8EBJzsa6JAAG
 
 
   # -----------------------------
@@ -32,5 +32,7 @@ keycloak:
 
   admin:
     client-id: vconnect-app
-    client-secret: MEbp3rUkqg8KtEjTFHmY7gQKbfnvRh1V
+    client-secret: NkQGc4WoQqfTISbNLVjL8EBJzsa6JAAG
+
+
 
