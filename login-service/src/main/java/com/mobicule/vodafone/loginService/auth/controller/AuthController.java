@@ -1,4 +1,5 @@
 package com.mobicule.vodafone.loginService.auth.controller;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobicule.vodafone.loginService.auth.util.KeycloakTokenUtil;
 import com.mobicule.vodafone.loginService.auth.util.KeycloakUserService;
 import com.mobicule.vodafone.loginService.common.dto.TokenResponse;
@@ -38,6 +39,9 @@ public class AuthController {
     @Autowired
     private APIService utility;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     public AuthController(KeycloakTokenUtil keycloakTokenUtil) {
         this.keycloakTokenUtil = keycloakTokenUtil;
     }
@@ -46,6 +50,9 @@ public class AuthController {
     @PostMapping("/generateOTP")
     public Response generateOtp(@RequestBody Request request) throws IOException {
 
+
+        String JsonRequest=  objectMapper.writeValueAsString(request);
+        log.info("Request :"+JsonRequest);
 
 
         String path=utility.getPropertyFilePath("jwtTokenOnOff");

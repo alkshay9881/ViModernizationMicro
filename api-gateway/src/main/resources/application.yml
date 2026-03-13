@@ -128,3 +128,5 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS, Asia/Kolkata} %level [%thread] %logger{36} - %msg%n"
 
 
+encrypt:
+  secret: P@ssw0rd4Ekyc456
