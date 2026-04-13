@@ -1,0 +1,70 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.mobicule</groupId>
+	<artifactId>keycloak-mobile-auth-spi</artifactId>
+	<version>1.0.0</version>
+
+	<properties>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+	</properties>
+
+
+
+	<dependencies>
+
+
+
+
+			<!-- Keycloak SPI -->
+
+
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-server-spi</artifactId>
+			<version>24.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-server-spi-private</artifactId>
+			<version>24.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-core</artifactId>
+			<version>24.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- ?? THIS WAS MISSING -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-model-storage</artifactId>
+			<version>24.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>2.0.13</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Oracle -->
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc11</artifactId>
+			<version>21.9.0.0</version>
+		</dependency>
+			<!-- Oracle JDBC 11 -->
+
+		</dependencies>
+
+
+</project>
