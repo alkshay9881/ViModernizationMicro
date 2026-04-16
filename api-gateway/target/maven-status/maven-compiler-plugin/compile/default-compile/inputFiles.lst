@@ -1,8 +1,0 @@
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/config/SecurityConfig.java
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/ApiGatewayApplication.java
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/resolver/UserIdKeyResolver.java
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/fallback/FallbackController.java
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/resolver/MobileKeyResolver.java
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/filter/EtopExtractionGlobalFilter.java
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/common/entities/Response.java
-/home/akshay/workspace new/2026/ViModernizationMicro(20feb2026)/api-gateway/src/main/java/com/mobicule/vodafone/apigateway/controller/ControllerMain.java
