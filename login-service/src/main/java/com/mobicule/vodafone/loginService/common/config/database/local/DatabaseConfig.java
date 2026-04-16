@@ -1,5 +1,6 @@
 package com.mobicule.vodafone.loginService.common.config.database.local;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,15 +15,25 @@ import javax.sql.DataSource;
 @Profile("local")
 public class DatabaseConfig {
 
+
+    @Value("${db.url}")
+    private String url;
+
+    @Value("${db.username}")
+    private String username;
+
+    @Value("${db.password}")
+    private String password;
+
     @Bean
     public DataSource dataSource() {
 
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
 
         dataSource.setDriverClassName("oracle.jdbc.driver.OracleDriver");
-        dataSource.setUrl("jdbc:oracle:thin:@192.168.1.11:1521:orcl");
-        dataSource.setUsername("Vodafone_ekyc");
-        dataSource.setPassword("welcome123");
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
 
         return dataSource;
     }

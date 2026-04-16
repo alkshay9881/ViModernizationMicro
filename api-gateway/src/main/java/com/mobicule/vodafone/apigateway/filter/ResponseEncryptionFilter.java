@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.*;
 import org.springframework.core.Ordered;
 import org.springframework.core.io.buffer.*;
+import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -19,17 +20,15 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class ResponseEncryptionFilter implements GlobalFilter, Ordered {
 
-
     @Autowired
     private EncryptDecryptService encryptDecryptService;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
-        String encryptedHeader =
-                exchange.getRequest().getHeaders().getFirst("X-Encrypted");
-
-        boolean isEncrypted = "true".equalsIgnoreCase(encryptedHeader);
+        boolean isEncrypted = "true".equalsIgnoreCase(
+                exchange.getRequest().getHeaders().getFirst("X-Encrypted")
+        );
 
         if (!isEncrypted) {
             return chain.filter(exchange);
@@ -44,56 +43,50 @@ public class ResponseEncryptionFilter implements GlobalFilter, Ordered {
                     @Override
                     public Mono<Void> writeWith(Publisher<? extends DataBuffer> body) {
 
-                        if (!(body instanceof Flux)) {
-                            return super.writeWith(body);
-                        }
-
-                        Flux<? extends DataBuffer> fluxBody = Flux.from(body);
-
-                        return DataBufferUtils.join(fluxBody)
+                        return DataBufferUtils.join(body)
                                 .flatMap(dataBuffer -> {
 
-                                    byte[] content = new byte[dataBuffer.readableByteCount()];
-                                    dataBuffer.read(content);
-
+                                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
+                                    dataBuffer.read(bytes);
                                     DataBufferUtils.release(dataBuffer);
 
                                     String responseBody =
-                                            new String(content, StandardCharsets.UTF_8);
+                                            new String(bytes, StandardCharsets.UTF_8);
 
-                               //     log.info("Original Response: {}", responseBody);
+                                    log.info("Original Response: {}", responseBody);
 
-                                    String encrypted = null;
+                                    String encrypted;
                                     try {
                                         encrypted = encryptDecryptService.encryption(responseBody);
                                     } catch (Exception e) {
-                                        throw new RuntimeException(e);
+                                        log.error("Encryption failed", e);
+                                        return Mono.error(e);
                                     }
 
                                     String finalResponse =
                                             "{\"data\":\"" + encrypted + "\"}";
 
-                                    byte[] newBytes =
+                                    byte[] finalBytes =
                                             finalResponse.getBytes(StandardCharsets.UTF_8);
 
-                                    originalResponse.getHeaders()
-                                            .setContentLength(newBytes.length);
+                                    getDelegate().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+                                    getDelegate().getHeaders().setContentLength(finalBytes.length);
 
-                                    DataBuffer newBuffer =
-                                            bufferFactory.wrap(newBytes);
+                                    DataBuffer buffer = bufferFactory.wrap(finalBytes);
 
-                                    return super.writeWith(Mono.just(newBuffer));
+                                    return Mono.just(buffer)
+                                            .flatMap(b -> super.writeWith(Mono.just(b)));
                                 });
                     }
                 };
 
-        return chain.filter(
-                exchange.mutate().response(decoratedResponse).build()
-        );
+        return chain.filter(exchange.mutate()
+                .response(decoratedResponse)
+                .build());
     }
 
     @Override
     public int getOrder() {
-        return 2;
+        return 2; // VERY IMPORTANT: run before response commit
     }
 }

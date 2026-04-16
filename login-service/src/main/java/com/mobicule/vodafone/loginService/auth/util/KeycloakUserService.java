@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
@@ -77,38 +79,7 @@ public class KeycloakUserService {
     }
 
 
-    /* private String getAdminToken() {
-         try {
-             String tokenUrl = serverUrl + "/realms/vodafone/protocol/openid-connect/token";
 
-             HttpHeaders headers = new HttpHeaders();
-             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-             // Use MultiValueMap for proper URL encoding
-             MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-             body.add("grant_type", "password");
-             body.add("client_id", adminClientId);
-             body.add("client_secret", clientSecret);
-             body.add("username", adminUsername);
-             body.add("password", adminPassword);
-
-             HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(body, headers);
-
-             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, entity, Map.class);
-
-             if (response.getBody() != null && response.getBody().containsKey("access_token")) {
-                 return (String) response.getBody().get("access_token");
-             } else {
-                 throw new RuntimeException("Failed to obtain token: " + response.getBody());
-             }
-
-         } catch (HttpClientErrorException e) {
-             // Log the error response from Keycloak
-            log.info("Keycloak error: " + e.getResponseBodyAsString());
-             throw e;
-         }
-     }
- */
     // =========================
     // 2. FIND USER
     private String findUserId(String username, String token) {
@@ -237,5 +208,56 @@ public class KeycloakUserService {
 
         log.info("Done.");
     }
+
+
+    // =========================
+// 5. LOGOUT USER (INVALIDATE TOKENS)
+// =========================
+    private void logoutUser(String userId, String token) {
+
+        String url = serverUrl + "/admin/realms/" + realm +
+                "/users/" + userId + "/logout";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+            ResponseEntity<Void> response =
+                    restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
+
+            if (response.getStatusCode() == HttpStatus.NO_CONTENT) {
+                log.info("All sessions invalidated for userId: {}", userId);
+            } else {
+                log.warn("Unexpected response while logout: {}", response.getStatusCode());
+            }
+
+        } catch (Exception e) {
+            log.error("Error while logging out userId: {}", userId, e);
+            throw new RuntimeException("Failed to logout user sessions", e);
+        }
+    }
+
+
+    // =========================
+// 6. INVALIDATE BY USERNAME
+// =========================
+    public void invalidateUserSessions(String username) {
+
+        String token = getAdminToken();
+
+        String userId = findUserId(username, token);
+
+        if (userId == null) {
+            log.warn("User not found for username: {}", username);
+            return;
+        }
+
+        logoutUser(userId, token);
+    }
+
+
+
 }
 

@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: service-registry
+
+# ================= MANAGEMENT =================
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health, metrics
+
+
+# ================= LOGGING =================
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS, Asia/Kolkata} %level [%thread] %logger{36} - %msg%n"

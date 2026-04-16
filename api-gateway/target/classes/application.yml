@@ -1,0 +1,132 @@
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      routes:
+
+        # ================= GENERATE OTP =================
+        - id: generateOTP-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/generateOTP
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@mobileKeyResolver}"
+
+        # ================= VERIFY OTP =================
+        - id: verifyOTP-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/verifyOTP
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
+        # ================= REFRESH TOKEN =================
+        - id: refresh-token-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/refreshToken
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
+        # ================= VERIFY PASSWORD =================
+        - id: verify-pass-api
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/verifyPassword
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
+        # ================= ALL OTHER LOGIN APIs =================
+        - id: login-service
+          uri: lb://LOGIN-SERVICE
+          predicates:
+            - Path=/api/v1/auth/**
+          filters:
+            - name: CircuitBreaker
+              args:
+                name: loginServiceCB
+                fallbackUri: forward:/fallback/login
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 15
+                redis-rate-limiter.burstCapacity: 30
+                redis-rate-limiter.requestedTokens: 1
+                key-resolver: "#{@userIdKeyResolver}"
+
+
+# ================= RESILIENCE4J CONFIG =================
+resilience4j:
+
+  timelimiter:
+    instances:
+      loginServiceCB:
+        timeoutDuration: 10s
+        cancelRunningFuture: true
+
+  circuitbreaker:
+    instances:
+      loginServiceCB:
+        slidingWindowSize: 20
+        minimumNumberOfCalls: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 20s
+        permittedNumberOfCallsInHalfOpenState: 5
+
+
+# ================= MANAGEMENT =================
+
+
+  management:
+      endpoints:
+        web:
+          exposure:
+            include: health, metrics
+
+
+# ================= LOGGING =================
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS, Asia/Kolkata} %level [%thread] %logger{36} - %msg%n"
+
+
+encrypt:
+  secret: P@ssw0rd4Ekyc456

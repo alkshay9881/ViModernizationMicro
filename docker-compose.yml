@@ -102,8 +102,11 @@ services:
       - "8080:8080"
     networks:
       - vimodernization-net
+
     volumes:
       - /home/akshay/Desktop/ojdbc11.jar:/opt/keycloak/providers/ojdbc11.jar
+      - /home/akshay/Desktop/docker/keycloak-mobile-auth-spi-1.0.0.jar:/opt/keycloak/providers/keycloak-mobile-auth-spi-1.0.0.jar
+
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
@@ -111,6 +114,7 @@ services:
       KC_DB_URL: jdbc:oracle:thin:@10.1.1.207:1521:orcl
       KC_DB_USERNAME: vodafone_ekyc_keycloak
       KC_DB_PASSWORD: welcome
+
     command: [ "start-dev" ]
 
 
