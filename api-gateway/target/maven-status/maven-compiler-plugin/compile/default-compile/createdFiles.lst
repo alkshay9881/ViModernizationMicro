@@ -1,0 +1,9 @@
+com/mobicule/vodafone/apigateway/common/entities/Response$ResponseStatus.class
+com/mobicule/vodafone/apigateway/common/entities/Response.class
+com/mobicule/vodafone/apigateway/resolver/UserIdKeyResolver.class
+com/mobicule/vodafone/apigateway/resolver/MobileKeyResolver.class
+com/mobicule/vodafone/apigateway/config/SecurityConfig.class
+com/mobicule/vodafone/apigateway/controller/ControllerMain.class
+com/mobicule/vodafone/apigateway/ApiGatewayApplication.class
+com/mobicule/vodafone/apigateway/fallback/FallbackController.class
+com/mobicule/vodafone/apigateway/filter/EtopExtractionGlobalFilter.class
