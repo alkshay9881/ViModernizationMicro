@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 import com.mobicule.vodafone.loginService.common.entities.WSConfig;
-import com.mobicule.vodafone.loginService.common.exceptions.PropertyFileNotFoundException;
-import com.mobicule.vodafone.loginService.common.exceptions.PropertyFilePathNotFoundException;
+
+import com.mobicule.vodafone.loginService.exceptions.PropertyFileNotFoundException;
+import com.mobicule.vodafone.loginService.exceptions.PropertyFilePathNotFoundException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;

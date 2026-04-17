@@ -26,5 +26,10 @@ public class MultiMQProperties {
         private String trustStorePassword;
 
         public String responseClass;
+
+        public String format;
+
+        private String type;
+        private Boolean enabled;
     }
 }

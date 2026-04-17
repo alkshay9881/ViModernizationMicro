@@ -26,6 +26,7 @@ logging:
 mq:
   managers:
     SubmitCOCPDigitalCafLite:
+      type: sync
       queueManager: QMGENERIC
       channel: QMGENGW.VCONECT.SCN
       connName: 10.94.135.147(8220)
@@ -34,5 +35,40 @@ mq:
       timeout: 1500
       sslCipherSuite: TLS_RSA_WITH_AES_128_CBC_SHA256
       trustStore: /home/akshay/Desktop/docker/truststore.jks
-      responseClass: com.mobicule.vodafone.loginService.syncMQ.model.response.ReadWriteRspGBOXML
+      responseClass: com.mobicule.vodafone.loginService.syncMQ.model.submitCafLiteResponse.ReadWriteRspGBOXML
 
+
+    submitPosResubmission:
+      type: sync
+      queueManager: QMGENERIC
+      channel: QMGENGW.VCONECT.SCN
+      connName: 10.94.135.147(8220)
+      inputQueue: APPS.CPOS.POSSUBMITREQ.ESB.RQI.02
+      outputQueue: VCONNECT.CPOS.POSSUBMITREQ.ESB.RPO.02
+      timeout: 15000
+      sslCipherSuite: TLS_RSA_WITH_AES_128_CBC_SHA256
+      trustStore: /home/akshay/Desktop/docker/truststore.jks
+      responseClass: com.mobicule.vodafone.loginService.syncMQ.model.posResubResponse.POSResubmissionApiResponseJSON
+
+    COCEventNotifyASync :
+      type: sync
+      queueManager: QMRECCGWS
+      channel: QMRECGWS.VCONECT.SCN
+      connName: 10.94.135.147(7976)
+      inputQueue: VCONNECT.ESB.COCFLAGUPDT.CPOS.RQI.03
+      outputQueue: VCONNECT.ESB.COCFLAGUPDT.CPOS.RQI.03
+      timeout: 15000
+      sslCipherSuite: TLS_RSA_WITH_AES_128_CBC_SHA256
+      trustStore: /home/akshay/Desktop/docker/truststore7976.jks
+      responseClass: com.mobicule.vodafone.loginService.syncMQ.model.posResubResponse.POSResubmissionApiResponseJSON
+
+    activationBackUpdateListener:
+      type: async
+      enabled: false
+      queueManager: QMRECCGWS
+      channel: QMRECGWS.VCONECT.SCN
+      connName: 10.94.135.147(7976)
+      outputQueue: APPS.VCONNECT.CAFNOTIFICATION.RQO.03
+      timeout: 15000
+      sslCipherSuite: TLS_RSA_WITH_AES_128_CBC_SHA256
+      trustStore: /home/akshay/Desktop/docker/truststore7976.jks

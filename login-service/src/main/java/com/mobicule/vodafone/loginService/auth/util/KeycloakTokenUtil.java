@@ -3,7 +3,8 @@ package com.mobicule.vodafone.loginService.auth.util;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.mobicule.vodafone.loginService.common.dto.TokenResponse;
-import com.mobicule.vodafone.loginService.common.exceptions.UnauthorizedAccessException;
+
+import com.mobicule.vodafone.loginService.exceptions.UnauthorizedAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;

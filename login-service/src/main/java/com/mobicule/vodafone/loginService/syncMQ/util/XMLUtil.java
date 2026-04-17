@@ -1,6 +1,5 @@
 package com.mobicule.vodafone.loginService.syncMQ.util;
 
-import com.mobicule.vodafone.loginService.syncMQ.model.response.ReadWriteRspGBOXML;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
